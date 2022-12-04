@@ -1,0 +1,46 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: sample-app-gateway
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+  - port:
+      number: 443 # For Production
+      name: https
+      protocol: HTTPS
+    hosts:
+    - "*"
+    tls:
+      mode: ISTIO_MUTUAL # enables HTTPS on this port
+      credentialName: sample-app-credential # must be the same as secret
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: sample-app
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - sample-app-gateway
+  http:
+  - match:
+    - uri:
+        exact: /sample/
+    route:
+    - destination:
+        host: sample-app-svc
+        port:
+          number: 3000
+    retries:
+      attempts: 3
+      perTryTimeout: 2s
+    timeout: 10s

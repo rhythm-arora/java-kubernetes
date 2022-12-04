@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-app-deployment
+  labels:
+    app: tomcat-app
+spec:
+  replicas: 2
+  minReadySeconds: 45 # give container 45 sec to get ready and only then send the req 
+  selector:
+    matchLabels:
+      app: tomcat-app # map all pods with this label to deployment
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: tomcat-app
+    spec:
+      containers:
+      - name: tomcat-app
+        image: arorarhythm/tomcat:sample_latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        resources: # how much resources container can use in the pod
+          requests:
+            cpu: 100m
+            memory: 512Mi
+          limits: # max limit
+            cpu: 500m
+            memory: 1024Mi
+        readinessProbe: # check at the start of container if it is ready to accept request
+          httpGet:
+            path:
+        livenessProbe: # check if the container is running properly
+          httpGet:
+            path:
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample-app-svc
+spec:
+  selector:
+    app: tomcat-app # label of the pod
+  ports:
+  - port: 3000
+    targetPort: 8080
+    name: http
