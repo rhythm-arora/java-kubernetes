@@ -22,6 +22,7 @@ $ kubectl get nodes
 
 NAME             STATUS   ROLES    AGE   VERSION
 docker-desktop   Ready    master   1d    v1.21.5
+```
 
 ### Create Docker Hub Account
 
@@ -48,6 +49,7 @@ Open cli of your choice and execute the following commands.
 - Push Image to Docker Hub
     ```
     $ docker image push <username/repo>:{image_name}
+    ```
     
 # Deploying Application to Kubernetes Cluster
 
